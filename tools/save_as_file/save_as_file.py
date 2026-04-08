@@ -1,43 +1,38 @@
 from collections.abc import Generator
 from typing import Any
-import base64
-import codecs
-import mimetypes
 
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
+
+from provider.file_tools import normalize_api_base_url
+
+from ._upload_helpers import build_file_blob, require_string_parameter, resolve_mime_type, upload_file
 
 
 class SaveAsFileTool(Tool):
 
     def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
         content = tool_parameters.get("content")
-        filename = tool_parameters.get("filename")
+        filename = require_string_parameter(tool_parameters, "filename")
+        user = require_string_parameter(tool_parameters, "user")
         mime_type = tool_parameters.get("mime_type", "")
-        format = tool_parameters.get("format", "raw")
+        format = tool_parameters.get("format", "text")
         encoding = tool_parameters.get("encoding", "") or "utf-8"
 
-        if not mime_type:
-            mime_type, _ = mimetypes.guess_type(filename)
-        if not mime_type:
-            raise ValueError("MIME type could not be determined by filename. Please provide a valid MIME type explicitly.")
-
-        if format == "text":
-            try:
-                codecs.lookup(encoding)
-            except LookupError:
-                raise ValueError(f"Invalid encoding: '{encoding}'. Please provide a valid Python encoding name.")
-            try:
-                file_blob = content.encode(encoding)
-            except UnicodeEncodeError as e:
-                raise ValueError(f"Content cannot be encoded with '{encoding}': {e}")
-        else:
-            file_blob = base64.b64decode(content)
-
-        yield self.create_blob_message(
-            blob=file_blob,
-            meta={
-                "mime_type": mime_type,
-                "filename": filename,
-            },
+        api_base_url = normalize_api_base_url(
+            self.runtime.credentials.get("api_base_url") or self.runtime.credentials.get("api_uri") or ""
         )
+        api_key = require_string_parameter(self.runtime.credentials, "api_key")
+
+        resolved_mime_type = resolve_mime_type(filename, mime_type)
+        file_blob = build_file_blob(content, format, encoding)
+        result = upload_file(
+            api_base_url=api_base_url,
+            api_key=api_key,
+            user=user,
+            filename=filename,
+            mime_type=resolved_mime_type,
+            file_blob=file_blob,
+        )
+
+        yield self.create_json_message(result)

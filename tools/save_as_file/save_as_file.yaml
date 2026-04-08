@@ -1,6 +1,6 @@
 identity:
   name: save_as_file
-  author: kurokobo
+  author: sysam68
   label:
     en_US: Save as File
     ja_JP: ファイルとして保存
@@ -9,11 +9,11 @@ identity:
 
 description:
   human:
-    en_US: Save input text or base64 encoded binary data as a file with specified file name and MIME type.
+    en_US: Upload input text or base64 encoded binary data to the public Dify Files API and return the uploaded file object as JSON.
     ja_JP: 入力テキストまたは Base64 エンコードされたバイナリデータを、指定されたファイル名と MIME タイプでファイルとして保存します。
     zh_Hans: 将输入文本或 Base64 编码的二进制数据保存为具有指定文件名和 MIME 类型的文件。
     pt_BR: Salva texto de entrada ou dados binários codificados em Base64 como um arquivo com nome de arquivo e tipo MIME especificados.
-  llm: Save input text or base64 encoded binary data as a file with specified file name and MIME type.
+  llm: Upload input text or base64 encoded binary data to the public Dify Files API and return the uploaded file object as JSON.
 
 parameters:
 
@@ -56,6 +56,17 @@ parameters:
         Deve incluir a extensão do arquivo (por exemplo, "output.txt").
     required: true
     default: "output.txt"
+    form: llm
+
+  - name: user
+    type: string
+    label:
+      en_US: Dify user identifier
+    human_description:
+      en_US: >-
+        User identifier required by Dify's public Files API. This value is sent as the multipart `user` field
+        when calling POST /files/upload.
+    required: true
     form: llm
 
   - name: mime_type

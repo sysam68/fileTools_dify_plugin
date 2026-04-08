@@ -1,6 +1,6 @@
 identity:
   name: embed_as_base64
-  author: kurokobo
+  author: sysam68
   label:
     en_US: Embed as Base64
     ja_JP: Base64 として埋め込み

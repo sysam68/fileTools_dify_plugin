@@ -1,10 +1,9 @@
 # 📦 File Tools - A collection of various tools for handling file object
 
-- **Plugin ID** : kurokobo/file_tools
-- **Author** : kurokobo
+- **Plugin ID** : sysam68/file_tools
+- **Author** : sysam68
 - **Type** : tool
-- **Repository** : https://github.com/kurokobo/dify-plugin-collection
-- **Marketplace** : https://marketplace.dify.ai/plugins/kurokobo/file_tools
+- **Repository** : https://github.com/sysam68/fileTools_dify_plugin
 
 ## ✨ Overview
 
@@ -87,7 +86,30 @@ If you select the `markdown` format, the output will be a link (`[text](...)`) w
 
 ### ✅ Save as File
 
-This is a tool to save input text or base64 encoded binary data as a file. You can specify the file name, MIME type, and the format of the content:
+This tool now uploads input text or base64 encoded binary data through Dify's public Files API (`POST /files/upload`) and returns the raw file object JSON produced by Dify. You can specify the file name, MIME type, file content format, and the `user` identifier required by the API.
+
+The returned JSON follows Dify's upload response shape, for example:
+
+```json
+{
+  "id": "f4a5066e-68a0-421a-b0fd-482af8361bf1",
+  "name": "Capture d'écran 23.03.2026 à 10.23.29 AM.png",
+  "size": 505510,
+  "extension": "png",
+  "mime_type": "image/png",
+  "created_by": "c48a50b8-efec-49a2-b513-8c06ec4c1927",
+  "created_at": 1775646988,
+  "preview_url": null,
+  "source_url": "https://example.dify.ai/files/f4a5066e-68a0-421a-b0fd-482af8361bf1/file-preview?...",
+  "original_url": null,
+  "user_id": null,
+  "tenant_id": "50325c9b-1282-4765-8541-5607ffcbbab2",
+  "conversation_id": null,
+  "file_key": null
+}
+```
+
+You can specify the file name, MIME type, and the format of the content:
 
 - To save plain text as a file:
   - `content`: `Hello, world!`
@@ -104,6 +126,13 @@ This tool is useful for saving generated content or decoded binary data as a dow
 If you leave the MIME type empty, it will be automatically determined based on the file name. Of course, you can also specify a MIME type explicitly using the `mime_type` option.
 
 When the `format` is set to `text`, you can also specify the encoding using the `encoding` option (e.g., `utf-8`, `shift_jis`, `euc-jp`). If not specified, it defaults to `utf-8`.
+
+Provider configuration is now required:
+
+- `api_base_url` or `api_uri`: Dify public API base URL, for example `https://api.dify.ai/v1`
+- `api_key`: Dify API key used for file uploads
+
+This release only implements the upload endpoint. The preview/download endpoint remains available downstream in Dify as `GET /files/{file_id}/preview`.
 
 ## Related Links
 

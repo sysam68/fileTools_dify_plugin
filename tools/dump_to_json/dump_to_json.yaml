@@ -1,6 +1,6 @@
 identity:
   name: dump_to_json
-  author: kurokobo
+  author: sysam68
   label:
     en_US: Dump to JSON
     ja_JP: JSON にダンプ

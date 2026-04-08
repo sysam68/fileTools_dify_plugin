@@ -1,6 +1,6 @@
-version: 0.0.2
+version: 0.0.1
 type: plugin
-author: kurokobo
+author: sysam68
 name: file_tools
 label:
   en_US: File Tools
@@ -27,5 +27,5 @@ meta:
   minimum_dify_version: null
 created_at: 2025-07-07T00:00:00.000000000Z
 privacy: PRIVACY.md
-repo: https://github.com/kurokobo/dify-plugin-collection
+repo: https://github.com/sysam68/fileTools_dify_plugin
 verified: false
