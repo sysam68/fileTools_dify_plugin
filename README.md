@@ -142,13 +142,17 @@ This tool downloads a file from a public or signed URL, then uploads the downloa
 
 Typical inputs:
 
+- `input_file`: a standard Dify file object containing `url` or `remote_url`
 - `url`: a reachable file URL, including signed Dify file preview URLs such as `https://example.dify.ai/files/<file_id>/file-preview?...`
 - `user`: the Dify user identifier required by the Files API
 - `filename`: optional explicit override if the source response does not expose a useful file name
 - `mime_type`: optional explicit override if the source response does not expose a useful content type
 
+If both are present, `url` overrides `input_file.url`.
+
 When `filename` is empty, the tool tries, in order:
 
+- `input_file.filename`
 - `Content-Disposition`
 - the URL path when it contains a real file name
 - a generated fallback name based on the detected MIME type

@@ -9,7 +9,9 @@ from provider.file_tools import normalize_api_base_url
 from tools.save_as_file._upload_helpers import (
     download_remote_file,
     optional_string_parameter,
+    read_file_attribute,
     require_string_parameter,
+    resolve_source_url,
     upload_file,
 )
 
@@ -17,10 +19,11 @@ from tools.save_as_file._upload_helpers import (
 class SaveFileFromUrlTool(Tool):
 
     def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
-        url = require_string_parameter(tool_parameters, "url")
+        input_file = tool_parameters.get("input_file")
+        url = resolve_source_url(tool_parameters, input_file)
         user = optional_string_parameter(tool_parameters, "user")
-        filename = tool_parameters.get("filename")
-        mime_type = tool_parameters.get("mime_type")
+        filename = optional_string_parameter(tool_parameters, "filename") or read_file_attribute(input_file, "filename", "name")
+        mime_type = optional_string_parameter(tool_parameters, "mime_type") or read_file_attribute(input_file, "mime_type")
 
         api_base_url = normalize_api_base_url(
             self.runtime.credentials.get("api_base_url") or self.runtime.credentials.get("api_uri") or ""

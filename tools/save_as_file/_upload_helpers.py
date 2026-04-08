@@ -26,6 +26,18 @@ def resolve_download_url(raw_url: str) -> str:
     return trimmed
 
 
+def resolve_source_url(tool_parameters: dict[str, Any], input_file: Any) -> str:
+    explicit_url = optional_string_parameter(tool_parameters, "url")
+    if explicit_url:
+        return explicit_url
+
+    file_url = read_file_attribute(input_file, "url", "remote_url")
+    if file_url:
+        return file_url
+
+    raise ValueError("Either url or input_file with url/remote_url is required")
+
+
 def resolve_mime_type(filename: str, mime_type: str | None) -> str:
     resolved = (mime_type or "").strip()
     if resolved:
@@ -80,6 +92,26 @@ def optional_string_parameter(tool_parameters: dict[str, Any], name: str) -> str
 
     trimmed = value.strip()
     return trimmed or None
+
+
+def read_file_attribute(input_file: Any, *names: str) -> str | None:
+    if input_file is None:
+        return None
+
+    for name in names:
+        if hasattr(input_file, name):
+            value = getattr(input_file, name)
+        elif isinstance(input_file, dict):
+            value = input_file.get(name)
+        else:
+            value = None
+
+        if isinstance(value, str):
+            trimmed = value.strip()
+            if trimmed:
+                return trimmed
+
+    return None
 
 
 def resolve_filename(filename: str | None, download_url: str, headers: httpx.Headers, mime_type: str) -> str:

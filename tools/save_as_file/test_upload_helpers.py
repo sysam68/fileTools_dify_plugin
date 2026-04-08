@@ -19,7 +19,9 @@ from tools.save_as_file._upload_helpers import (  # noqa: E402
     build_http_error_message,
     download_remote_file,
     optional_string_parameter,
+    read_file_attribute,
     resolve_mime_type,
+    resolve_source_url,
     upload_file,
 )
 
@@ -193,3 +195,37 @@ def test_download_remote_file_raises_useful_http_error() -> None:
 
 def test_optional_string_parameter_accepts_empty_value() -> None:
     assert optional_string_parameter({"user": ""}, "user") is None
+
+
+def test_resolve_source_url_from_input_file_url() -> None:
+    class InputFile:
+        url = "https://example.com/files/123/file-preview"
+
+    assert resolve_source_url({}, InputFile()) == "https://example.com/files/123/file-preview"
+
+
+def test_resolve_source_url_from_input_file_remote_url() -> None:
+    input_file = {"remote_url": "https://example.com/files/123/file-preview"}
+    assert resolve_source_url({}, input_file) == "https://example.com/files/123/file-preview"
+
+
+def test_resolve_source_url_prefers_explicit_url() -> None:
+    input_file = {"url": "https://example.com/old"}
+    assert resolve_source_url({"url": "https://example.com/new"}, input_file) == "https://example.com/new"
+
+
+def test_resolve_source_url_requires_any_source() -> None:
+    with pytest.raises(ValueError, match="Either url or input_file"):
+        resolve_source_url({}, None)
+
+
+def test_read_file_attribute_reads_standard_dify_fields() -> None:
+    class InputFile:
+        filename = "Capture.png"
+        mime_type = "image/png"
+        remote_url = "https://example.com/files/123/file-preview"
+
+    input_file = InputFile()
+    assert read_file_attribute(input_file, "filename", "name") == "Capture.png"
+    assert read_file_attribute(input_file, "mime_type") == "image/png"
+    assert read_file_attribute(input_file, "url", "remote_url") == "https://example.com/files/123/file-preview"

@@ -10,13 +10,23 @@ description:
   llm: Download a file from a public or signed URL, upload it to the public Dify Files API, and return the uploaded file object as JSON.
 
 parameters:
+  - name: input_file
+    type: file
+    label:
+      en_US: Input file
+    human_description:
+      en_US: Standard Dify file object. The tool uses its `url` or `remote_url` field as the download source.
+    required: false
+    form: llm
+
   - name: url
     type: string
     label:
       en_US: Source URL
     human_description:
-      en_US: Public or signed URL to download before uploading the file to Dify.
-    required: true
+      en_US: Optional public or signed URL to download before uploading the file to Dify. If omitted, the tool uses `input_file.url` or `input_file.remote_url`.
+    required: false
+    default: ""
     form: llm
 
   - name: user
@@ -34,7 +44,7 @@ parameters:
     label:
       en_US: Override file name
     human_description:
-      en_US: Optional explicit file name. If empty, the tool uses Content-Disposition or derives a name from the source response.
+      en_US: Optional explicit file name. If empty, the tool uses `input_file.filename`, Content-Disposition, or derives a name from the source response.
     required: false
     default: ""
     form: llm
@@ -44,7 +54,7 @@ parameters:
     label:
       en_US: Override MIME type
     human_description:
-      en_US: Optional explicit MIME type. If empty, the tool uses the source response Content-Type header or infers the type from the chosen file name.
+      en_US: Optional explicit MIME type. If empty, the tool uses `input_file.mime_type`, the source response Content-Type header, or infers the type from the chosen file name.
     required: false
     default: ""
     form: llm
