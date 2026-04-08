@@ -88,26 +88,24 @@ If you select the `markdown` format, the output will be a link (`[text](...)`) w
 
 ### ✅ Save as File
 
-This tool now uploads input text or base64 encoded binary data through Dify's public Files API (`POST /files/upload`) and returns the raw file object JSON produced by Dify. You can specify the file name, MIME type, file content format, and the `user` identifier required by the API.
+This tool now uploads input text or base64 encoded binary data through Dify's public Files API (`POST /files/upload`) and returns a standard Dify `file` object dictionary that can be reused directly in other nodes.
 
-The returned JSON follows Dify's upload response shape, for example:
+The returned JSON follows Dify's standard `file` mapping shape, for example:
 
 ```json
 {
-  "id": "f4a5066e-68a0-421a-b0fd-482af8361bf1",
-  "name": "Capture d'écran 23.03.2026 à 10.23.29 AM.png",
-  "size": 505510,
-  "extension": "png",
-  "mime_type": "image/png",
-  "created_by": "c48a50b8-efec-49a2-b513-8c06ec4c1927",
-  "created_at": 1775646988,
-  "preview_url": null,
-  "source_url": "https://example.dify.ai/files/f4a5066e-68a0-421a-b0fd-482af8361bf1/file-preview?...",
-  "original_url": null,
-  "user_id": null,
+  "dify_model_identity": "__dify__file__",
+  "id": null,
   "tenant_id": "50325c9b-1282-4765-8541-5607ffcbbab2",
-  "conversation_id": null,
-  "file_key": null
+  "type": "image",
+  "transfer_method": "local_file",
+  "remote_url": "https://example.dify.ai/files/f4a5066e-68a0-421a-b0fd-482af8361bf1/file-preview?...",
+  "related_id": "f4a5066e-68a0-421a-b0fd-482af8361bf1",
+  "filename": "Capture d'écran 23.03.2026 à 10.23.29 AM.png",
+  "extension": ".png",
+  "mime_type": "image/png",
+  "size": 505510,
+  "url": "https://example.dify.ai/files/f4a5066e-68a0-421a-b0fd-482af8361bf1/file-preview?..."
 }
 ```
 
@@ -138,7 +136,7 @@ This release only implements the upload endpoint. The preview/download endpoint 
 
 ### ✅ Save File from URL
 
-This tool downloads a file from a public or signed URL, then uploads the downloaded binary to Dify's public Files API (`POST /files/upload`) and returns the raw file object JSON produced by Dify.
+This tool downloads a file from a public or signed URL, then uploads the downloaded binary to Dify's public Files API (`POST /files/upload`) and returns a standard Dify `file` object dictionary.
 
 Typical inputs:
 

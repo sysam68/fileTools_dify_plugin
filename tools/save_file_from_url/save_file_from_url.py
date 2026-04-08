@@ -12,6 +12,7 @@ from tools.save_as_file._upload_helpers import (
     read_file_attribute,
     require_string_parameter,
     resolve_source_url,
+    to_dify_file,
     upload_file,
 )
 
@@ -35,7 +36,7 @@ class SaveFileFromUrlTool(Tool):
             filename=filename,
             mime_type=mime_type,
         )
-        result = upload_file(
+        upload_result = upload_file(
             api_base_url=api_base_url,
             api_key=api_key,
             user=user,
@@ -44,4 +45,4 @@ class SaveFileFromUrlTool(Tool):
             file_blob=file_blob,
         )
 
-        yield self.create_json_message(result)
+        yield self.create_json_message(to_dify_file(upload_result))

@@ -12,6 +12,7 @@ from urllib.parse import urlparse, unquote
 import httpx
 
 DEFAULT_TIMEOUT_SECONDS = 30.0
+FILE_MODEL_IDENTITY = "__dify__file__"
 
 
 def resolve_download_url(raw_url: str) -> str:
@@ -50,6 +51,31 @@ def resolve_mime_type(filename: str, mime_type: str | None) -> str:
     raise ValueError(
         "MIME type could not be determined by filename. Please provide a valid MIME type explicitly."
     )
+
+
+def to_dify_file(upload_payload: dict[str, Any]) -> dict[str, Any]:
+    upload_file_id = upload_payload.get("id")
+    filename = _require_upload_string(upload_payload, "name")
+    tenant_id = _require_upload_string(upload_payload, "tenant_id")
+    mime_type = _require_upload_string(upload_payload, "mime_type")
+    size = upload_payload.get("size")
+    extension = _normalize_extension(upload_payload.get("extension"), filename)
+    url = _require_upload_url(upload_payload)
+
+    return {
+        "dify_model_identity": FILE_MODEL_IDENTITY,
+        "id": None,
+        "tenant_id": tenant_id,
+        "type": detect_file_type(extension=extension, mime_type=mime_type),
+        "transfer_method": "local_file",
+        "remote_url": url,
+        "related_id": upload_file_id,
+        "filename": filename,
+        "extension": extension,
+        "mime_type": mime_type,
+        "size": int(size) if isinstance(size, int | float) else -1,
+        "url": url,
+    }
 
 
 def build_file_blob(content: Any, content_format: str, encoding: str) -> bytes:
@@ -197,6 +223,57 @@ def upload_file(
     return payload
 
 
+def detect_file_type(*, extension: str | None, mime_type: str | None) -> str:
+    normalized_extension = (extension or "").lower()
+    normalized_mime_type = (mime_type or "").lower()
+
+    if normalized_mime_type.startswith("image/"):
+        return "image"
+    if normalized_mime_type.startswith("audio/"):
+        return "audio"
+    if normalized_mime_type.startswith("video/"):
+        return "video"
+    if normalized_mime_type.startswith("text/") or normalized_mime_type in {
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-powerpoint",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "application/json",
+        "application/xml",
+    }:
+        return "document"
+
+    if normalized_extension in {
+        ".txt",
+        ".md",
+        ".markdown",
+        ".pdf",
+        ".doc",
+        ".docx",
+        ".xls",
+        ".xlsx",
+        ".ppt",
+        ".pptx",
+        ".csv",
+        ".json",
+        ".xml",
+        ".html",
+        ".htm",
+    }:
+        return "document"
+    if normalized_extension in {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"}:
+        return "image"
+    if normalized_extension in {".mp3", ".wav", ".m4a", ".ogg", ".aac", ".flac"}:
+        return "audio"
+    if normalized_extension in {".mp4", ".mov", ".avi", ".mkv", ".webm"}:
+        return "video"
+
+    return "custom"
+
+
 def build_http_error_message(response: httpx.Response) -> str:
     hint = {
         400: "Request rejected. Verify file content, filename, MIME type, and user.",
@@ -290,3 +367,28 @@ def _filename_from_content_disposition(raw_header: str | None) -> str | None:
             return Path(normalized_value).name
 
     return None
+
+
+def _normalize_extension(raw_extension: Any, filename: str) -> str | None:
+    if isinstance(raw_extension, str) and raw_extension.strip():
+        extension = raw_extension.strip()
+        return extension if extension.startswith(".") else f".{extension}"
+
+    guessed = Path(filename).suffix.strip()
+    return guessed or None
+
+
+def _require_upload_string(upload_payload: dict[str, Any], key: str) -> str:
+    value = upload_payload.get(key)
+    if not isinstance(value, str) or not value.strip():
+        raise RuntimeError(f"Dify Files API upload payload is missing required field '{key}'")
+    return value.strip()
+
+
+def _require_upload_url(upload_payload: dict[str, Any]) -> str:
+    for key in ("source_url", "preview_url", "original_url"):
+        value = upload_payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+
+    raise RuntimeError("Dify Files API upload payload is missing a usable file URL")

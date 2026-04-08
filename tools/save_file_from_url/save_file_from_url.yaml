@@ -6,8 +6,8 @@ identity:
 
 description:
   human:
-    en_US: Download a file from a public or signed URL, upload it to the public Dify Files API, and return the uploaded file object as JSON.
-  llm: Download a file from a public or signed URL, upload it to the public Dify Files API, and return the uploaded file object as JSON.
+    en_US: Download a file from a public or signed URL, upload it to the public Dify Files API, and return a standard Dify file object dictionary.
+  llm: Download a file from a public or signed URL, upload it to the public Dify Files API, and return a standard Dify file object dictionary.
 
 parameters:
   - name: input_file

@@ -22,6 +22,7 @@ from tools.save_as_file._upload_helpers import (  # noqa: E402
     read_file_attribute,
     resolve_mime_type,
     resolve_source_url,
+    to_dify_file,
     upload_file,
 )
 
@@ -229,3 +230,32 @@ def test_read_file_attribute_reads_standard_dify_fields() -> None:
     assert read_file_attribute(input_file, "filename", "name") == "Capture.png"
     assert read_file_attribute(input_file, "mime_type") == "image/png"
     assert read_file_attribute(input_file, "url", "remote_url") == "https://example.com/files/123/file-preview"
+
+
+def test_to_dify_file_builds_standard_dify_mapping() -> None:
+    payload = {
+        "id": "f4a5066e-68a0-421a-b0fd-482af8361bf1",
+        "name": "Capture.png",
+        "size": 505510,
+        "extension": "png",
+        "mime_type": "image/png",
+        "tenant_id": "50325c9b-1282-4765-8541-5607ffcbbab2",
+        "source_url": "https://example.com/files/f4a5066e/file-preview?sign=abc",
+    }
+
+    result = to_dify_file(payload)
+
+    assert result == {
+        "dify_model_identity": "__dify__file__",
+        "id": None,
+        "tenant_id": "50325c9b-1282-4765-8541-5607ffcbbab2",
+        "type": "image",
+        "transfer_method": "local_file",
+        "remote_url": "https://example.com/files/f4a5066e/file-preview?sign=abc",
+        "related_id": "f4a5066e-68a0-421a-b0fd-482af8361bf1",
+        "filename": "Capture.png",
+        "extension": ".png",
+        "mime_type": "image/png",
+        "size": 505510,
+        "url": "https://example.com/files/f4a5066e/file-preview?sign=abc",
+    }

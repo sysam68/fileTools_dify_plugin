@@ -11,6 +11,7 @@ from ._upload_helpers import (
     optional_string_parameter,
     require_string_parameter,
     resolve_mime_type,
+    to_dify_file,
     upload_file,
 )
 
@@ -32,7 +33,7 @@ class SaveAsFileTool(Tool):
 
         resolved_mime_type = resolve_mime_type(filename, mime_type)
         file_blob = build_file_blob(content, format, encoding)
-        result = upload_file(
+        upload_result = upload_file(
             api_base_url=api_base_url,
             api_key=api_key,
             user=user,
@@ -41,4 +42,4 @@ class SaveAsFileTool(Tool):
             file_blob=file_blob,
         )
 
-        yield self.create_json_message(result)
+        yield self.create_json_message(to_dify_file(upload_result))
