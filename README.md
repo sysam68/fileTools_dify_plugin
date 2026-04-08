@@ -17,6 +17,8 @@ A collection of various tools for handling file objects:
   - Get a download URL for a file object, optionally as a markdown link
 - **Save as File**
   - Save input text or base64 encoded binary data as a file with specified file name and MIME type
+- **Save File from URL**
+  - Download a file from a public or signed URL, then upload it to Dify Files
 
 ## 🛠️ Bundled Tools
 
@@ -133,6 +135,23 @@ Provider configuration is now required:
 - `api_key`: Dify API key used for file uploads
 
 This release only implements the upload endpoint. The preview/download endpoint remains available downstream in Dify as `GET /files/{file_id}/preview`.
+
+### ✅ Save File from URL
+
+This tool downloads a file from a public or signed URL, then uploads the downloaded binary to Dify's public Files API (`POST /files/upload`) and returns the raw file object JSON produced by Dify.
+
+Typical inputs:
+
+- `url`: a reachable file URL, including signed Dify file preview URLs such as `https://example.dify.ai/files/<file_id>/file-preview?...`
+- `user`: the Dify user identifier required by the Files API
+- `filename`: optional explicit override if the source response does not expose a useful file name
+- `mime_type`: optional explicit override if the source response does not expose a useful content type
+
+When `filename` is empty, the tool tries, in order:
+
+- `Content-Disposition`
+- the URL path when it contains a real file name
+- a generated fallback name based on the detected MIME type
 
 ## Related Links
 

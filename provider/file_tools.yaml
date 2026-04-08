@@ -15,6 +15,7 @@ tools:
   - tools/embed_as_base64/embed_as_base64.yaml
   - tools/get_download_url/get_download_url.yaml
   - tools/save_as_file/save_as_file.yaml
+  - tools/save_file_from_url/save_file_from_url.yaml
 
 extra:
   python:

@@ -64,9 +64,10 @@ parameters:
       en_US: Dify user identifier
     human_description:
       en_US: >-
-        User identifier required by Dify's public Files API. This value is sent as the multipart `user` field
-        when calling POST /files/upload.
-    required: true
+        Optional user identifier sent as the multipart `user` field when calling POST /files/upload.
+        Leave it empty when your Dify instance accepts anonymous file uploads.
+    required: false
+    default: ""
     form: llm
 
   - name: mime_type

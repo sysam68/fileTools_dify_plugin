@@ -15,7 +15,10 @@ if str(ROOT) not in sys.path:
 
 from tools.save_as_file._upload_helpers import (  # noqa: E402
     build_file_blob,
+    build_download_http_error_message,
     build_http_error_message,
+    download_remote_file,
+    optional_string_parameter,
     resolve_mime_type,
     upload_file,
 )
@@ -73,6 +76,32 @@ def test_upload_file_returns_json_payload_unchanged() -> None:
     client_cls.assert_called_once()
 
 
+def test_upload_file_omits_user_field_when_not_provided() -> None:
+    payload = {"id": "123", "name": "demo.txt"}
+    response = MagicMock()
+    response.status_code = 201
+    response.json.return_value = payload
+
+    client = MagicMock()
+    client.post.return_value = response
+    client.__enter__.return_value = client
+    client.__exit__.return_value = None
+
+    with patch("tools.save_as_file._upload_helpers.httpx.Client", return_value=client):
+        result = upload_file(
+            api_base_url="https://api.dify.ai/v1",
+            api_key="secret",
+            user=None,
+            filename="demo.txt",
+            mime_type="text/plain",
+            file_blob=b"hello",
+        )
+
+    assert result == payload
+    _, kwargs = client.post.call_args
+    assert kwargs["data"] is None
+
+
 def test_upload_file_raises_useful_http_error() -> None:
     response = httpx.Response(
         401,
@@ -104,3 +133,63 @@ def test_upload_file_rejects_non_json_success_response() -> None:
                 mime_type="text/plain",
                 file_blob=b"hello",
             )
+
+
+def test_download_remote_file_uses_content_disposition_filename() -> None:
+    response = httpx.Response(
+        200,
+        headers={
+            "Content-Type": "image/png",
+            "Content-Disposition": 'attachment; filename="capture.png"',
+        },
+        content=b"png-bytes",
+        request=httpx.Request("GET", "https://example.com/file-preview"),
+    )
+
+    client = MagicMock()
+    client.get.return_value = response
+    client.__enter__.return_value = client
+    client.__exit__.return_value = None
+
+    with patch("tools.save_as_file._upload_helpers.httpx.Client", return_value=client):
+        filename, mime_type, file_blob = download_remote_file(url="https://example.com/file-preview")
+
+    assert filename == "capture.png"
+    assert mime_type == "image/png"
+    assert file_blob == b"png-bytes"
+
+
+def test_download_remote_file_generates_filename_from_mime_type() -> None:
+    response = httpx.Response(
+        200,
+        headers={"Content-Type": "image/png"},
+        content=b"png-bytes",
+        request=httpx.Request("GET", "https://example.com/files/123/file-preview"),
+    )
+
+    client = MagicMock()
+    client.get.return_value = response
+    client.__enter__.return_value = client
+    client.__exit__.return_value = None
+
+    with patch("tools.save_as_file._upload_helpers.httpx.Client", return_value=client):
+        filename, mime_type, file_blob = download_remote_file(url="https://example.com/files/123/file-preview")
+
+    assert filename == "downloaded-file.png"
+    assert mime_type == "image/png"
+    assert file_blob == b"png-bytes"
+
+
+def test_download_remote_file_raises_useful_http_error() -> None:
+    response = httpx.Response(
+        404,
+        text="Not Found",
+        request=httpx.Request("GET", "https://example.com/files/missing"),
+    )
+
+    with pytest.raises(RuntimeError, match="HTTP 404"):
+        raise RuntimeError(build_download_http_error_message(response))
+
+
+def test_optional_string_parameter_accepts_empty_value() -> None:
+    assert optional_string_parameter({"user": ""}, "user") is None
