@@ -154,3 +154,10 @@ parameters:
 extra:
   python:
     source: tools/save_as_file/save_as_file.py
+
+output_schema:
+  type: object
+  properties:
+    saved_file:
+      type: object
+      description: Standard Dify file object dictionary generated from the uploaded file.

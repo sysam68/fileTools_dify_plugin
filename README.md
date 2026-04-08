@@ -88,7 +88,7 @@ If you select the `markdown` format, the output will be a link (`[text](...)`) w
 
 ### ✅ Save as File
 
-This tool now uploads input text or base64 encoded binary data through Dify's public Files API (`POST /files/upload`) and returns a standard Dify `file` object dictionary that can be reused directly in other nodes.
+This tool now uploads input text or base64 encoded binary data through Dify's public Files API (`POST /files/upload`) and returns a named output variable `saved_file` containing a standard Dify `file` object dictionary that can be reused directly in other nodes.
 
 The returned JSON follows Dify's standard `file` mapping shape, for example:
 
@@ -136,7 +136,7 @@ This release only implements the upload endpoint. The preview/download endpoint 
 
 ### ✅ Save File from URL
 
-This tool downloads a file from a public or signed URL, then uploads the downloaded binary to Dify's public Files API (`POST /files/upload`) and returns a standard Dify `file` object dictionary.
+This tool downloads a file from a public or signed URL, then uploads the downloaded binary to Dify's public Files API (`POST /files/upload`) and returns a named output variable `saved_file` containing a standard Dify `file` object dictionary.
 
 Typical inputs:
 

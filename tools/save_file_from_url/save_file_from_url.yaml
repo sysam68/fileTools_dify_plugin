@@ -62,3 +62,10 @@ parameters:
 extra:
   python:
     source: tools/save_file_from_url/save_file_from_url.py
+
+output_schema:
+  type: object
+  properties:
+    saved_file:
+      type: object
+      description: Standard Dify file object dictionary generated from the downloaded and uploaded file.

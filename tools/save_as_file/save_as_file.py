@@ -42,4 +42,4 @@ class SaveAsFileTool(Tool):
             file_blob=file_blob,
         )
 
-        yield self.create_json_message(to_dify_file(upload_result))
+        yield self.create_variable_message("saved_file", to_dify_file(upload_result))
