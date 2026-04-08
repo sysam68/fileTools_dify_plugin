@@ -67,5 +67,4 @@ output_schema:
   type: object
   properties:
     saved_file:
-      type: object
-      description: Standard Dify file object dictionary generated from the downloaded and uploaded file.
+      $ref: https://dify.ai/schemas/v1/file.json
