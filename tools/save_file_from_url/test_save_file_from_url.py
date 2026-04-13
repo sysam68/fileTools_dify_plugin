@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
 from tools.save_file_from_url.save_file_from_url import SaveFileFromUrlTool  # noqa: E402
 
 
-def test_save_file_from_url_returns_saved_file_and_files_variables() -> None:
+def test_save_file_from_url_returns_only_files_variable() -> None:
     runtime = ToolRuntime(
         credentials={"api_base_url": "https://api.example.com", "api_key": "secret"},
         user_id=None,
@@ -61,8 +61,6 @@ def test_save_file_from_url_returns_saved_file_and_files_variables() -> None:
             )
         )
 
-    assert len(messages) == 2
-    assert messages[0].message.variable_name == "saved_file"
-    assert messages[0].message.variable_value == saved_file
-    assert messages[1].message.variable_name == "files"
-    assert messages[1].message.variable_value == [saved_file]
+    assert len(messages) == 1
+    assert messages[0].message.variable_name == "files"
+    assert messages[0].message.variable_value == [saved_file]

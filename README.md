@@ -138,8 +138,7 @@ This release only implements the upload endpoint. The preview/download endpoint 
 
 This tool downloads a file from a public or signed URL, then uploads the downloaded binary to Dify's public Files API (`POST /files/upload`) and returns:
 
-- `saved_file`: a standard Dify `file` object dictionary
-- `files`: an array containing the same uploaded Dify file object, for downstream nodes expecting the standard files collection
+- `files`: an array containing the uploaded Dify file object, for downstream nodes expecting the standard files collection
 
 Typical inputs:
 
