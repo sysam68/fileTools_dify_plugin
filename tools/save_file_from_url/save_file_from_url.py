@@ -45,4 +45,6 @@ class SaveFileFromUrlTool(Tool):
             file_blob=file_blob,
         )
 
-        yield self.create_variable_message("saved_file", to_dify_file(upload_result))
+        saved_file = to_dify_file(upload_result)
+        yield self.create_variable_message("saved_file", saved_file)
+        yield self.create_variable_message("files", [saved_file])

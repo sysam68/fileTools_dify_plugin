@@ -66,5 +66,9 @@ extra:
 output_schema:
   type: object
   properties:
+    files:
+      type: array
+      items:
+        $ref: https://dify.ai/schemas/v1/file.json
     saved_file:
       $ref: https://dify.ai/schemas/v1/file.json
