@@ -15,10 +15,10 @@ A collection of various tools for handling file objects:
   - Convert a file to data URI format (Base64 encoded), optionally in markdown format
 - **Get Download URL**
   - Get a download URL for a file object, optionally as a markdown link
-- **Save as File**
-  - Save input text or base64 encoded binary data as a file with specified file name and MIME type
-- **Save File from URL**
-  - Download a file from a public or signed URL, then upload it to Dify Files
+- **Upload from Content**
+  - Convert input text or base64 encoded binary data into a native Dify file output
+- **Upload from URL**
+  - Download a file from a public or signed URL and return it as a native Dify file output
 
 ## 🛠️ Bundled Tools
 
@@ -86,28 +86,9 @@ This tool is useful when you want to pass a file download link to another node, 
 If you select the `plain` format (default), the output will be a plain URL string.
 If you select the `markdown` format, the output will be a link (`[text](...)`) with the file name or a custom text (by `link_text`).
 
-### ✅ Save as File
+### ✅ Upload from Content
 
-This tool now uploads input text or base64 encoded binary data through Dify's public Files API (`POST /files/upload`) and returns a named output variable `saved_file` containing a standard Dify `file` object dictionary that can be reused directly in other nodes.
-
-The returned JSON follows Dify's standard `file` mapping shape, for example:
-
-```json
-{
-  "dify_model_identity": "__dify__file__",
-  "id": null,
-  "tenant_id": "50325c9b-1282-4765-8541-5607ffcbbab2",
-  "type": "image",
-  "transfer_method": "local_file",
-  "remote_url": "https://example.dify.ai/files/f4a5066e-68a0-421a-b0fd-482af8361bf1/file-preview?...",
-  "related_id": "f4a5066e-68a0-421a-b0fd-482af8361bf1",
-  "filename": "Capture d'écran 23.03.2026 à 10.23.29 AM.png",
-  "extension": ".png",
-  "mime_type": "image/png",
-  "size": 505510,
-  "url": "https://example.dify.ai/files/f4a5066e-68a0-421a-b0fd-482af8361bf1/file-preview?..."
-}
-```
+This tool converts input text or base64 encoded binary data into a native Dify `blob` file output. Dify creates the actual file object and URLs downstream, instead of the plugin reconstructing them manually.
 
 You can specify the file name, MIME type, and the format of the content:
 
@@ -121,30 +102,22 @@ You can specify the file name, MIME type, and the format of the content:
   - `filename`: `hello.txt`
   - `format`: `base64`
 
-This tool is useful for saving generated content or decoded binary data as a downloadable file.
+This tool is useful for turning generated content or decoded binary data into a reusable file output.
 
 If you leave the MIME type empty, it will be automatically determined based on the file name. Of course, you can also specify a MIME type explicitly using the `mime_type` option.
 
 When the `format` is set to `text`, you can also specify the encoding using the `encoding` option (e.g., `utf-8`, `shift_jis`, `euc-jp`). If not specified, it defaults to `utf-8`.
 
-Provider configuration is now required:
+No provider credentials are required for this flow.
 
-- `api_base_url` or `api_uri`: Dify public API base URL, for example `https://api.dify.ai/v1`
-- `api_key`: Dify API key used for file uploads
+### ✅ Upload from URL
 
-This release only implements the upload endpoint. The preview/download endpoint remains available downstream in Dify as `GET /files/{file_id}/preview`.
-
-### ✅ Save File from URL
-
-This tool downloads a file from a public or signed URL, then uploads the downloaded binary to Dify's public Files API (`POST /files/upload`) and returns:
-
-- `files`: an array containing the uploaded Dify file object, for downstream nodes expecting the standard files collection
+This tool downloads a file from a public or signed URL and returns it as a native Dify `blob` file output.
 
 Typical inputs:
 
 - `input_file`: a standard Dify file object containing `url` or `remote_url`
 - `url`: a reachable file URL, including signed Dify file preview URLs such as `https://example.dify.ai/files/<file_id>/file-preview?...`
-- `user`: the Dify user identifier required by the Files API
 - `filename`: optional explicit override if the source response does not expose a useful file name
 - `mime_type`: optional explicit override if the source response does not expose a useful content type
 

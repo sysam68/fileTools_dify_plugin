@@ -1,19 +1,19 @@
 identity:
-  name: save_as_file
+  name: upload_from_content
   author: sysam68
   label:
-    en_US: Save as File
-    ja_JP: ファイルとして保存
-    zh_Hans: 保存为文件
-    pt_BR: Salvar como Arquivo
+    en_US: Upload from Content
+    ja_JP: コンテンツからアップロード
+    zh_Hans: 从内容上传
+    pt_BR: Enviar a partir do conteúdo
 
 description:
   human:
-    en_US: Upload input text or base64 encoded binary data to the public Dify Files API and return a standard Dify file object dictionary.
-    ja_JP: 入力テキストまたは Base64 エンコードされたバイナリデータを、指定されたファイル名と MIME タイプでファイルとして保存します。
-    zh_Hans: 将输入文本或 Base64 编码的二进制数据保存为具有指定文件名和 MIME 类型的文件。
-    pt_BR: Salva texto de entrada ou dados binários codificados em Base64 como um arquivo com nome de arquivo e tipo MIME especificados.
-  llm: Upload input text or base64 encoded binary data to the public Dify Files API and return a standard Dify file object dictionary.
+    en_US: Convert input text or base64 encoded binary data into a native Dify blob file output.
+    ja_JP: 入力テキストまたは Base64 エンコードされたバイナリデータをネイティブな Dify blob ファイル出力に変換します。
+    zh_Hans: 将输入文本或 Base64 编码的二进制数据转换为原生 Dify blob 文件输出。
+    pt_BR: Converte texto de entrada ou dados binários codificados em Base64 em uma saída de arquivo blob nativa do Dify.
+  llm: Convert input text or base64 encoded binary data into a native Dify blob file output.
 
 parameters:
 
@@ -56,18 +56,6 @@ parameters:
         Deve incluir a extensão do arquivo (por exemplo, "output.txt").
     required: true
     default: "output.txt"
-    form: llm
-
-  - name: user
-    type: string
-    label:
-      en_US: Dify user identifier
-    human_description:
-      en_US: >-
-        Optional user identifier sent as the multipart `user` field when calling POST /files/upload.
-        Leave it empty when your Dify instance accepts anonymous file uploads.
-    required: false
-    default: ""
     form: llm
 
   - name: mime_type
@@ -153,10 +141,4 @@ parameters:
 
 extra:
   python:
-    source: tools/save_as_file/save_as_file.py
-
-output_schema:
-  type: object
-  properties:
-    saved_file:
-      $ref: https://dify.ai/schemas/v1/file.json
+    source: tools/upload_from_content/upload_from_content.py

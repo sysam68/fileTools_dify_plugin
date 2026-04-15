@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.save_as_file._upload_helpers import (  # noqa: E402
+from tools.upload_from_content._upload_helpers import (  # noqa: E402
     build_file_blob,
     build_download_http_error_message,
     build_http_error_message,
@@ -61,7 +61,7 @@ def test_upload_file_returns_json_payload_unchanged() -> None:
     client.__enter__.return_value = client
     client.__exit__.return_value = None
 
-    with patch("tools.save_as_file._upload_helpers.httpx.Client", return_value=client) as client_cls:
+    with patch("tools.upload_from_content._upload_helpers.httpx.Client", return_value=client) as client_cls:
         result = upload_file(
             api_base_url="https://api.dify.ai/v1",
             api_key="secret",
@@ -90,7 +90,7 @@ def test_upload_file_omits_user_field_when_not_provided() -> None:
     client.__enter__.return_value = client
     client.__exit__.return_value = None
 
-    with patch("tools.save_as_file._upload_helpers.httpx.Client", return_value=client):
+    with patch("tools.upload_from_content._upload_helpers.httpx.Client", return_value=client):
         result = upload_file(
             api_base_url="https://api.dify.ai/v1",
             api_key="secret",
@@ -126,7 +126,7 @@ def test_upload_file_rejects_non_json_success_response() -> None:
     client.__enter__.return_value = client
     client.__exit__.return_value = None
 
-    with patch("tools.save_as_file._upload_helpers.httpx.Client", return_value=client):
+    with patch("tools.upload_from_content._upload_helpers.httpx.Client", return_value=client):
         with pytest.raises(RuntimeError, match="non-JSON response"):
             upload_file(
                 api_base_url="https://api.dify.ai/v1",
@@ -154,7 +154,7 @@ def test_download_remote_file_uses_content_disposition_filename() -> None:
     client.__enter__.return_value = client
     client.__exit__.return_value = None
 
-    with patch("tools.save_as_file._upload_helpers.httpx.Client", return_value=client):
+    with patch("tools.upload_from_content._upload_helpers.httpx.Client", return_value=client):
         filename, mime_type, file_blob = download_remote_file(url="https://example.com/file-preview")
 
     assert filename == "capture.png"
@@ -175,7 +175,7 @@ def test_download_remote_file_generates_filename_from_mime_type() -> None:
     client.__enter__.return_value = client
     client.__exit__.return_value = None
 
-    with patch("tools.save_as_file._upload_helpers.httpx.Client", return_value=client):
+    with patch("tools.upload_from_content._upload_helpers.httpx.Client", return_value=client):
         filename, mime_type, file_blob = download_remote_file(url="https://example.com/files/123/file-preview")
 
     assert filename == "downloaded-file.png"

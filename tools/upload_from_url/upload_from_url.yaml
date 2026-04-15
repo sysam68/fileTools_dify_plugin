@@ -1,13 +1,13 @@
 identity:
-  name: save_file_from_url
+  name: upload_from_url
   author: sysam68
   label:
-    en_US: Save File from URL
+    en_US: Upload from URL
 
 description:
   human:
-    en_US: Download a file from a public or signed URL, upload it to the public Dify Files API, and return a standard Dify file object dictionary.
-  llm: Download a file from a public or signed URL, upload it to the public Dify Files API, and return a standard Dify file object dictionary.
+    en_US: Download a file from a public or signed URL and return it as a native Dify blob message.
+  llm: Download a file from a public or signed URL and return it as a native Dify blob message.
 
 parameters:
   - name: input_file
@@ -24,7 +24,7 @@ parameters:
     label:
       en_US: Source URL
     human_description:
-      en_US: Optional public or signed URL to download before uploading the file to Dify. If omitted, the tool uses `input_file.url` or `input_file.remote_url`.
+      en_US: Optional public or signed URL to download. If omitted, the tool uses `input_file.url` or `input_file.remote_url`.
     required: false
     default: ""
     form: llm
@@ -34,7 +34,7 @@ parameters:
     label:
       en_US: Dify user identifier
     human_description:
-      en_US: Optional user identifier sent as the multipart `user` field when calling POST /files/upload. Leave it empty when your Dify instance accepts anonymous file uploads.
+      en_US: Deprecated and ignored. Kept for backward compatibility.
     required: false
     default: ""
     form: llm
@@ -61,12 +61,4 @@ parameters:
 
 extra:
   python:
-    source: tools/save_file_from_url/save_file_from_url.py
-
-output_schema:
-  type: object
-  properties:
-    files:
-      type: array
-      items:
-        $ref: https://dify.ai/schemas/v1/file.json
+    source: tools/upload_from_url/upload_from_url.py
