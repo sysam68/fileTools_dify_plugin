@@ -42,4 +42,4 @@ def test_upload_from_url_returns_blob_message() -> None:
 
     assert len(messages) == 1
     assert messages[0].message.blob == b"png-bytes"
-    assert messages[0].meta == {"filename": "capture.png", "mime_type": "image/png"}
+    assert messages[0].meta == {"filename": "capture.png", "file_name": "capture.png", "mime_type": "image/png"}

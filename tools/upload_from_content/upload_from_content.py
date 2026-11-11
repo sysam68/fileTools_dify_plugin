@@ -11,7 +11,7 @@ from ._upload_helpers import (
 )
 
 
-class UploadFromContentTool(Tool):
+class SaveAsFileTool(Tool):
 
     def _invoke(self, tool_parameters: dict[str, Any]) -> Generator[ToolInvokeMessage]:
         content = tool_parameters.get("content")
@@ -26,6 +26,7 @@ class UploadFromContentTool(Tool):
             blob=file_blob,
             meta={
                 "filename": filename,
+                "file_name": filename,
                 "mime_type": resolved_mime_type,
             },
         )

@@ -162,6 +162,24 @@ def test_download_remote_file_uses_content_disposition_filename() -> None:
     assert file_blob == b"png-bytes"
 
 
+def test_download_remote_file_rejects_html_when_mime_type_forced() -> None:
+    response = httpx.Response(
+        200,
+        headers={"Content-Type": "text/html; charset=utf-8"},
+        content=b"<!doctype html><html><head><title>Login</title></head><body>auth</body></html>",
+        request=httpx.Request("GET", "https://example.com/files/123"),
+    )
+
+    client = MagicMock()
+    client.get.return_value = response
+    client.__enter__.return_value = client
+    client.__exit__.return_value = None
+
+    with patch("tools.upload_from_content._upload_helpers.httpx.Client", return_value=client):
+        with pytest.raises(RuntimeError, match="returned HTML content"):
+            download_remote_file(url="https://example.com/files/123", filename="capture.png", mime_type="image/png")
+
+
 def test_download_remote_file_generates_filename_from_mime_type() -> None:
     response = httpx.Response(
         200,

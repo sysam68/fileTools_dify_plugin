@@ -29,6 +29,7 @@ class UploadFromUrlTool(Tool):
             blob=file_blob,
             meta={
                 "filename": resolved_filename,
+                "file_name": resolved_filename,
                 "mime_type": resolved_mime_type,
             },
         )

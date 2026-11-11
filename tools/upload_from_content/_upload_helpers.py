@@ -166,6 +166,7 @@ def download_remote_file(
     timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS,
 ) -> tuple[str, str, bytes]:
     resolved_url = resolve_download_url(url)
+    explicit_mime_type = (mime_type or "").strip()
 
     try:
         with httpx.Client(timeout=httpx.Timeout(timeout_seconds), follow_redirects=True) as client:
@@ -179,6 +180,20 @@ def download_remote_file(
     file_blob = response.content
     if not file_blob:
         raise RuntimeError("Source URL returned an empty response body")
+
+    header_mime_type = (response.headers.get("content-type") or "").split(";", 1)[0].strip().lower()
+    if explicit_mime_type and header_mime_type and header_mime_type != explicit_mime_type.lower():
+        if header_mime_type in {"text/html", "application/xhtml+xml"} or _looks_like_html(file_blob):
+            raise RuntimeError(
+                "Source URL returned HTML content, not a downloadable file "
+                f"(Content-Type: {header_mime_type}). Use a direct file URL (not a preview/login page), "
+                "or omit/adjust mime_type."
+            )
+        if header_mime_type == "application/json" and explicit_mime_type.lower() != "application/json":
+            raise RuntimeError(
+                "Source URL returned JSON content, not a downloadable file "
+                f"(Content-Type: {header_mime_type}). Use a direct file URL, or omit/adjust mime_type."
+            )
 
     resolved_mime_type = resolve_download_mime_type(filename, mime_type, response.headers)
     resolved_filename = resolve_filename(filename, resolved_url, response.headers, resolved_mime_type)
@@ -346,6 +361,11 @@ def resolve_download_mime_type(filename: str | None, mime_type: str | None, head
     raise ValueError(
         "MIME type could not be determined from the source URL response. Please provide mime_type explicitly."
     )
+
+
+def _looks_like_html(payload: bytes) -> bool:
+    head = payload[:512].lstrip().lower()
+    return head.startswith(b"<!doctype html") or head.startswith(b"<html") or b"<head" in head or b"<body" in head
 
 
 def _filename_from_content_disposition(raw_header: str | None) -> str | None:

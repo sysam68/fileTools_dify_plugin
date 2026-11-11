@@ -11,12 +11,12 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.upload_from_content.upload_from_content import UploadFromContentTool  # noqa: E402
+from tools.upload_from_content.upload_from_content import SaveAsFileTool  # noqa: E402
 
 
-def test_upload_from_content_returns_blob_message() -> None:
+def test_save_as_file_returns_blob_message() -> None:
     runtime = ToolRuntime(credentials={}, user_id=None, session_id=None)
-    tool = UploadFromContentTool(runtime=runtime, session=MagicMock())
+    tool = SaveAsFileTool(runtime=runtime, session=MagicMock())
 
     messages = list(
         tool._invoke(
@@ -32,4 +32,4 @@ def test_upload_from_content_returns_blob_message() -> None:
 
     assert len(messages) == 1
     assert messages[0].message.blob == b"Hello"
-    assert messages[0].meta == {"filename": "hello.txt", "mime_type": "text/plain"}
+    assert messages[0].meta == {"filename": "hello.txt", "file_name": "hello.txt", "mime_type": "text/plain"}

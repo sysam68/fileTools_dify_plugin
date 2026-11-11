@@ -1,8 +1,8 @@
 identity:
-  name: upload_from_content
+  name: save_as_file
   author: sysam68
   label:
-    en_US: Upload from Content
+    en_US: Save as File
     ja_JP: コンテンツからアップロード
     zh_Hans: 从内容上传
     pt_BR: Enviar a partir do conteúdo
